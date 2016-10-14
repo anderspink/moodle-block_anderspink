@@ -1,0 +1,30 @@
+.block.block_anderspink {
+}
+
+.block.block_anderspink a.ap-article {
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 10px;
+    display: block;
+    line-height: normal;
+    overflow: hidden;
+}
+
+.block.block_anderspink .ap-article-text {
+    font-size: 0.9em;
+}
+.block.block_anderspink .ap-margin-right {
+    margin-right: 65px;
+}
+
+.block.block_anderspink .ap-article-image-container {
+    float: right;
+    width: 60px;
+}
+.block.block_anderspink .ap-article-image {
+    max-width: 100%;
+}
+.block.block_anderspink .ap-article-text-extra {
+    font-size: 0.8em;
+    color: #949494;
+}
