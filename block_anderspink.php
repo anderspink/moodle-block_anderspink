@@ -33,10 +33,56 @@ class block_anderspink extends block_base {
     function init() {
         $this->title = get_string('pluginname', 'block_anderspink');
     }
+    
+    function render_article($article, $image_position='side') {
+        
+        $side = $image_position === 'side';
+        
+        $extra = array();
+        if ($article['domain']) {
+            $extra[] = $article['domain'];
+        }
+        if ($article['date_published']) {
+            $extra[] = $this->time2str($article['date_published']);
+        }
+        
+        $image = "";
+        if ($article['image']) {
+            $image = "
+                <div class='" . ($side ? "ap-article-image-container-side" : "ap-article-image-container-top") . "'>
+                    <img class='ap-article-image' src='{$article['image']}' />
+                </div>
+            ";
+        }
+        
+        
+        return "
+            <a class='ap-article' href='{$article['url']}'>
+                {$image}
+                <div class='" . (($side && $article['image']) ? 'ap-margin-right' : '') . "'>
+                    <div>{$article['title']}</div>
+                    <div class='ap-article-text-extra'>". implode(' - ', $extra) ."</div>
+                </div>
+            </a>
+        ";
+    }
 
     function get_content() {
-        global $CFG, $OUTPUT;
+        global $CFG, $OUTPUT, $PAGE;
         
+        // defaults
+        if (!$this->config->source) {
+            $this->config->source = 'briefing';
+        }
+        if (!$this->config->image) {
+            $this->config->image = 'side';
+        }
+        if (!$this->config->column) {
+            $this->config->column = 1;
+        }
+        
+        // load the javascript
+        //$PAGE->requires->yui_module('moodle-block_anderspink', 'M.anderspink.init');
         
         if ($this->config->title) {
             $this->title = $this->config->title;
@@ -63,22 +109,38 @@ class block_anderspink extends block_base {
             $this->content->text = 'Please set the API key in the global Anders Pink block settings.';
             return $this->content;
         }
-        if (!$this->config->briefing) {
-            $this->content->text = 'Please configure this block and choose a briefing to show.';
-            return $this->content;
-        }
         
+        
+        $dateNow = (new DateTime())->format('Y-m-d\TH:i:s');
         $cache = cache::make('block_anderspink', 'apdata');
-        $key = 'briefing_' . $this->config->briefing;
-        $datetime = new DateTime();
-        $dateNow = $datetime->format('Y-m-d\TH:i:s');
-        $date1Hour = $datetime->add(new DateInterval('PT1H'))->format('Y-m-d\TH:i:s');
+        
+        $key = null;
+        $dateOfExpiry = null;
+        $url = null;
+        
+        if ($this->config->source === 'briefing') {
+            if (!$this->config->briefing) {
+                $this->content->text = 'Please configure this block and choose a briefing to show.';
+                return $this->content;
+            }
+            $key = 'briefing_' . $this->config->briefing . '_' . $apiKey;
+            $dateOfExpiry = (new DateTime())->add(new DateInterval('PT30M'))->format('Y-m-d\TH:i:s'); // 30 minutes
+            $url = 'https://anderspink.com/api/v1/briefings/' . $this->config->briefing;
+        } else {
+            if (!$this->config->board) {
+                $this->content->text = 'Please configure this block and choose a board to show.';
+                return $this->content;
+            }
+            $key = 'board_' . $this->config->board . '_' . $apiKey;
+            $dateOfExpiry = (new DateTime())->add(new DateInterval('PT1M'))->format('Y-m-d\TH:i:s'); // 1 minute
+            $url = 'https://anderspink.com/api/v1/boards/' . $this->config->board;
+        }
         
         // Check the cache first...
         $stringResponse = $cache->get($key);
         if ($stringResponse) {
             $response = json_decode($stringResponse, true);
-            if ($response['ttl'] > $date1Hour) {
+            if ($response['ttl'] > $dateOfExpiry) {
                 $response = null;
             }
         }
@@ -86,7 +148,7 @@ class block_anderspink extends block_base {
         if (!$response) {
             // Do an API call to load the briefings...
             $fullResponse = download_file_content(
-                'https://anderspink.com/api/v1/briefings/' . $this->config->briefing,
+                $url,
                 array('X-Api-Key' => $apiKey),
                 null,
                 true
@@ -100,7 +162,7 @@ class block_anderspink extends block_base {
         }
         
         if (!$response) {
-            $this->content->text = 'There was an unknown issue loading the briefing.';
+            $this->content->text = 'There was an unknown issue loading the briefing/board.';
             return $this->content;
         }
         
@@ -111,35 +173,34 @@ class block_anderspink extends block_base {
         
         $articleHtml = array();
         foreach (array_slice($response['data']['articles'],0,5) as $article) {
+            $articleHtml[] = $this->render_article($article, $this->config->image);
+        }
         
-            $image = "";
-            if ($article['image']) {
-                $image = "
-                    <div class='ap-article-image-container'>
-                        <img class='ap-article-image' src='{$article['image']}' />
+        // Linear..
+        if ($this->config->column === 1) {
+            $this->content->text = implode("\n", $articleHtml);
+        } else if ($this->config->column === 2) {
+            
+            $rowHtml = array();
+            $rows = array_chunk($articleHtml, 2);
+            foreach ($rows as $row) {
+                $rowHtml[] = "
+                    <div class='ap-row'>
+                        <div class='ap-column2'>
+                            <div class='ap-column-inner-first'>
+                                {$row[0]}
+                            </div>
+                        </div>
+                        <div class='ap-column2'>
+                            <div class='ap-column-inner-last'>
+                                {$row[1]}
+                            </div>
+                        </div>
                     </div>
                 ";
             }
-            $extra = array();
-            if ($article['domain']) {
-                $extra[] = $article['domain'];
-            }
-            if ($article['date_published']) {
-                $extra[] = $this->time2str($article['date_published']);
-            }
-            
-            $articleHtml[] = "
-                <a class='ap-article' href='{$article['url']}'>
-                    {$image}
-                    <div class='" . ($article['image'] ? 'ap-margin-right' : '') . "'>
-                        <div>{$article['title']}</div>
-                        <div class='ap-article-text-extra'>". implode(' - ', $extra) ."</div>
-                    </div>
-                </a>
-            ";
+            $this->content->text = implode("\n", $rowHtml);
         }
-        $this->content->text = implode("\n", $articleHtml);
-        
         
         return $this->content;
     }

@@ -23,8 +23,11 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$string['blockstring'] = 'Block title, defaults to: Anders Pink';
-$string['briefingselect'] = 'Select a briefing';
+$string['blockstring'] = 'Block title';
+$string['boardselect'] = 'Saved boards';
+$string['showbriefing'] = 'Show a briefing';
+$string['showsavedboard'] = 'Show a saved board';
+$string['briefingselect'] = 'Briefings';
 $string['descconfig'] = 'Description of the config section';
 $string['descfoo'] = 'Global settings for the Anders Pink plugin';
 $string['desckey'] = 'The secret API key from your Anders Pink account, e.g. YaZSpkIGoDF0rSHTn2nYGVvvx3u56nlG';
@@ -34,4 +37,9 @@ $string['anderspink:addinstance'] = 'Add a anderspink block';
 $string['anderspink:myaddinstance'] = 'Add a anderspink block to my moodle';
 $string['pluginname'] = 'Anders Pink';
 $string['cachedef_apdata'] = 'Anders Pink API result cache, for performance and reducing API calls';
+$string['sideimage'] = 'On the right (small)';
+$string['topimage'] = 'Above (large)';
+$string['onecolumn'] = 'One column';
+$string['twocolumns'] = 'Two columns';
+
 
