@@ -82,6 +82,10 @@ class block_anderspink_edit_form extends block_edit_form {
         $mform->setDefault('config_column', 1);
         $mform->setType('config_column', PARAM_INT);
         
+        $mform->addElement('text', 'config_limit', get_string('numberofarticles', 'block_anderspink'));
+        $mform->setDefault('config_limit', 5);
+        $mform->setType('config_limit', PARAM_INT);
+        
         $mform->addElement('html', '
             <script type="text/javascript">
                 YUI().use("node", function (Y) {

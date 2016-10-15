@@ -80,6 +80,10 @@ class block_anderspink extends block_base {
         if (!$this->config->column) {
             $this->config->column = 1;
         }
+        if (!$this->config->limit) {
+            $this->config->limit = 5;
+        }
+        $this->config->limit = max(min($this->config->limit, 30),1); // Cap betwen 1-30
         
         // load the javascript
         //$PAGE->requires->yui_module('moodle-block_anderspink', 'M.anderspink.init');
@@ -118,22 +122,23 @@ class block_anderspink extends block_base {
         $dateOfExpiry = null;
         $url = null;
         
+        // Cache key is based on the config and api key, so that it's invalidated when the config changes
+        $key = md5(json_encode($this->config)) . $apiKey;
+        
         if ($this->config->source === 'briefing') {
             if (!$this->config->briefing) {
                 $this->content->text = 'Please configure this block and choose a briefing to show.';
                 return $this->content;
             }
-            $key = 'briefing_' . $this->config->briefing . '_' . $apiKey;
             $dateOfExpiry = (new DateTime())->add(new DateInterval('PT1M'))->format('Y-m-d\TH:i:s'); // 1 minute
-            $url = 'https://anderspink.com/api/v1/briefings/' . $this->config->briefing;
+            $url = "https://anderspink.com/api/v1/briefings/{$this->config->briefing}?limit={$this->config->limit}";
         } else {
             if (!$this->config->board) {
                 $this->content->text = 'Please configure this block and choose a board to show.';
                 return $this->content;
             }
-            $key = 'board_' . $this->config->board . '_' . $apiKey;
             $dateOfExpiry = (new DateTime())->add(new DateInterval('PT5S'))->format('Y-m-d\TH:i:s'); // 5 seconds
-            $url = 'https://anderspink.com/api/v1/boards/' . $this->config->board;
+            $url = "https://anderspink.com/api/v1/boards/{$this->config->board}?limit={$this->config->limit}";
         }
         
         // Check the cache first...
@@ -172,7 +177,7 @@ class block_anderspink extends block_base {
         }
         
         $articleHtml = array();
-        foreach (array_slice($response['data']['articles'],0,5) as $article) {
+        foreach (array_slice($response['data']['articles'],0,$this->config->limit) as $article) {
             $articleHtml[] = $this->render_article($article, $this->config->image);
         }
         
