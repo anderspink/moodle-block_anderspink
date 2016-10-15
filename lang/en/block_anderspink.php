@@ -41,6 +41,6 @@ $string['sideimage'] = 'On the right (small)';
 $string['topimage'] = 'Above (large)';
 $string['onecolumn'] = 'One column';
 $string['twocolumns'] = 'Two columns';
-$string['numberofarticles'] = 'Number of articles to show';
+$string['numberofarticles'] = 'Number of articles to show (min 1, max 30)';
 
 

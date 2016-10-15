@@ -57,7 +57,7 @@ class block_anderspink extends block_base {
         
         
         return "
-            <a class='ap-article' href='{$article['url']}'>
+            <a class='ap-article' href='{$article['url']}' target='_blank'>
                 {$image}
                 <div class='" . (($side && $article['image']) ? 'ap-margin-right' : '') . "'>
                     <div>{$article['title']}</div>
