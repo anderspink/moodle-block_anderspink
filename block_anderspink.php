@@ -124,7 +124,7 @@ class block_anderspink extends block_base {
                 return $this->content;
             }
             $key = 'briefing_' . $this->config->briefing . '_' . $apiKey;
-            $dateOfExpiry = (new DateTime())->add(new DateInterval('PT30M'))->format('Y-m-d\TH:i:s'); // 30 minutes
+            $dateOfExpiry = (new DateTime())->add(new DateInterval('PT1M'))->format('Y-m-d\TH:i:s'); // 1 minute
             $url = 'https://anderspink.com/api/v1/briefings/' . $this->config->briefing;
         } else {
             if (!$this->config->board) {
@@ -132,7 +132,7 @@ class block_anderspink extends block_base {
                 return $this->content;
             }
             $key = 'board_' . $this->config->board . '_' . $apiKey;
-            $dateOfExpiry = (new DateTime())->add(new DateInterval('PT1M'))->format('Y-m-d\TH:i:s'); // 1 minute
+            $dateOfExpiry = (new DateTime())->add(new DateInterval('PT5S'))->format('Y-m-d\TH:i:s'); // 5 seconds
             $url = 'https://anderspink.com/api/v1/boards/' . $this->config->board;
         }
         
@@ -140,7 +140,7 @@ class block_anderspink extends block_base {
         $stringResponse = $cache->get($key);
         if ($stringResponse) {
             $response = json_decode($stringResponse, true);
-            if ($response['ttl'] > $dateOfExpiry) {
+            if ($dateNow > $response['ttl']) {
                 $response = null;
             }
         }
@@ -154,7 +154,7 @@ class block_anderspink extends block_base {
                 true
             );
             $response = json_decode($fullResponse->results, true);
-            $response['ttl'] = $dateNow;
+            $response['ttl'] = $dateOfExpiry;
             
             if ($response && $response['status'] === 'success') {
                 $cache->set($key, json_encode($response));
