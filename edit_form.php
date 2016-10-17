@@ -21,7 +21,7 @@ class block_anderspink_edit_form extends block_edit_form {
             $response = json_decode($fullResponse->results, true);
             
             if (!$response) {
-                $errors[] = 'Failed to do API call';
+                $errors[] = 'Failed to do API call: ' . $fullResponse->error;
             } else {
                 if ($response['status'] !== 'success') {
                     $errors[] = $response['message'];
@@ -41,6 +41,12 @@ class block_anderspink_edit_form extends block_edit_form {
         
         // Section header title according to language file.
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
+        
+        if (count($errors)) {
+            foreach ($errors as $i => $error) {
+                $mform->addElement('html', '<p style="background-color:#ffc7c7;padding:10px;">' . $error . '</p>');
+            }
+        }
 
         // A sample string variable with a default value.
         $mform->addElement('text', 'config_title', get_string('blockstring', 'block_anderspink'));
@@ -52,14 +58,6 @@ class block_anderspink_edit_form extends block_edit_form {
         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
         $mform->setDefault('config_source', 'briefing');
   
-        
-        /*
-        if (count($errors)) {
-            foreach ($errors as $i => $error) {
-                $mform->addElement('text', 'error_' . $i, 'There was an error getting the list of briefings from the API: ' . $error);
-            }
-        }
-        */
         
         $mform->addElement('html', '<div id="source_section_briefing">');
         $mform->addElement('select', 'config_briefing', get_string('briefingselect', 'block_anderspink'), $briefings, array());

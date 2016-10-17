@@ -19,17 +19,24 @@
 
 
 .block.block_anderspink .ap-article-image-container-top {
-    max-height: 120px;
-    overflow: hidden;
     margin-bottom: 5px;
-    text-align: center;
+    box-shadow: inset 0 0 1px #AAA;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 50%;
     background-color: #FFF;
-    box-shadow: inset 0 0 1px #aaa;
+    height: 120px;
 }
 
 .block.block_anderspink .ap-article-image-container-side {
     float: right;
+    box-shadow: inset 0 0 1px #aaa;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 50%;
+    background-color: #FFF;
     width: 60px;
+    height: 35px;
 }
 .block.block_anderspink .ap-article-image {
     max-width: 100%;

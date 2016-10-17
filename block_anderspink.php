@@ -49,18 +49,21 @@ class block_anderspink extends block_base {
         $image = "";
         if ($article['image']) {
             $image = "
-                <div class='" . ($side ? "ap-article-image-container-side" : "ap-article-image-container-top") . "'>
-                    <img class='ap-article-image' src='{$article['image']}' />
+                <div class='" . ($side ? "ap-article-image-container-side" : "ap-article-image-container-top") . "'
+                     style='background-image:url({$article['image']})'
+                >
                 </div>
             ";
         }
         
+        $cutoff = 75;
+        $title = strlen(trim($article['title'])) > $cutoff ? substr($article['title'],0,$cutoff) . "..." : $article['title'];
         
         return "
-            <a class='ap-article' href='{$article['url']}' target='_blank'>
+            <a class='ap-article' href='{$article['url']}' title='" . htmlspecialchars($article['title'], ENT_QUOTES) . "' target='_blank'>
                 {$image}
                 <div class='" . (($side && $article['image']) ? 'ap-margin-right' : '') . "'>
-                    <div>{$article['title']}</div>
+                    <div>". htmlspecialchars($title) . "</div>
                     <div class='ap-article-text-extra'>". implode(' - ', $extra) ."</div>
                 </div>
             </a>
@@ -69,6 +72,8 @@ class block_anderspink extends block_base {
 
     function get_content() {
         global $CFG, $OUTPUT;
+        
+        $apiHost = "https://anderspink.com";
         
         if ($this->content !== null) {
             return $this->content;
@@ -127,14 +132,14 @@ class block_anderspink extends block_base {
                 return $this->content;
             }
             $dateOfExpiry = (new DateTime())->add(new DateInterval('PT1M'))->format('Y-m-d\TH:i:s'); // 1 minute
-            $url = "https://anderspink.com/api/v1/briefings/{$this->config->briefing}?limit={$this->config->limit}";
+            $url = $apiHost . "/api/v1/briefings/{$this->config->briefing}?limit={$this->config->limit}";
         } else {
             if (!$this->config->board) {
                 $this->content->text = 'Please configure this block and choose a board to show.';
                 return $this->content;
             }
             $dateOfExpiry = (new DateTime())->add(new DateInterval('PT5S'))->format('Y-m-d\TH:i:s'); // 5 seconds
-            $url = "https://anderspink.com/api/v1/boards/{$this->config->board}?limit={$this->config->limit}";
+            $url = $apiHost . "/api/v1/boards/{$this->config->board}?limit={$this->config->limit}";
         }
         
         // Check the cache first...
@@ -155,15 +160,15 @@ class block_anderspink extends block_base {
                 true
             );
             $response = json_decode($fullResponse->results, true);
-            $response['ttl'] = $dateOfExpiry;
-            
+        
             if ($response && $response['status'] === 'success') {
+                $response['ttl'] = $dateOfExpiry;
                 $cache->set($key, json_encode($response));
             }
         }
         
         if (!$response) {
-            $this->content->text = 'There was an unknown issue loading the briefing/board.';
+            $this->content->text = 'There was an issue loading the briefing/board: ' . $fullResponse->error;
             return $this->content;
         }
         
