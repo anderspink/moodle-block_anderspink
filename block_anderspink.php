@@ -49,9 +49,9 @@ class block_anderspink extends block_base {
         $image = "";
         if ($article['image']) {
             $image = "
-                <div class='" . ($side ? "ap-article-image-container-side" : "ap-article-image-container-top") . "'
-                     style='background-image:url({$article['image']})'
-                >
+                <div class='" . ($side ? "ap-article-image-container-side" : "ap-article-image-container-top") . "'>
+                    <div class='" . ($side ? "ap-article-image-container-side-inner" : "ap-article-image-container-top-inner") . "' style='background-image:url({$article['image']})'>
+                    </div>
                 </div>
             ";
         }
