@@ -25,6 +25,7 @@
     background-size: cover;
     background-position: 50%;
     background-color: #FFF;
+    background-image: url('https://anderspink.com/placeholder.jpg');
     height: 120px;
 }
 .block.block_anderspink .ap-article-image-container-top-inner {
@@ -41,7 +42,7 @@
     background-size: cover;
     background-position: 50%;
     background-color: #FFF;
-    background-image: url('http://localhost:3000/placeholder.jpg');
+    background-image: url('https://anderspink.com/placeholder.jpg');
     width: 60px;
     height: 35px;
 }
