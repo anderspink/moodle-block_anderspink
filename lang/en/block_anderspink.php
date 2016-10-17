@@ -30,7 +30,7 @@ $string['showsavedboard'] = 'Show a saved board';
 $string['briefingselect'] = 'Briefings';
 $string['descconfig'] = 'Description of the config section';
 $string['descfoo'] = 'Global settings for the Anders Pink plugin';
-$string['desckey'] = 'The secret API key from your Anders Pink account, e.g. YaZSpkIGoDF0rSHTn2nYGVvvx3u56nlG';
+$string['desckey'] = "Enter the API key from your Anders Pink account or use our free account key which is <strong>WL4VDET6kcH29PDTG2RVF60Yqv76E39z</strong> to access our free  briefings. <br /><br />To find out more about how you can create custom briefings visit <a href='https://anderspink.com'>https://anderspink.com</a>.";
 $string['headerconfig'] = 'Main plugin settings';
 $string['labelkey'] = 'Anders Pink API key';
 $string['anderspink:addinstance'] = 'Add a anderspink block';

@@ -68,7 +68,16 @@ class block_anderspink extends block_base {
     }
 
     function get_content() {
-        global $CFG, $OUTPUT, $PAGE;
+        global $CFG, $OUTPUT;
+        
+        if ($this->content !== null) {
+            return $this->content;
+        }
+
+        if (empty($this->instance)) {
+            $this->content = '';
+            return $this->content;
+        }
         
         // defaults
         if (!$this->config->source) {
@@ -84,36 +93,22 @@ class block_anderspink extends block_base {
             $this->config->limit = 5;
         }
         $this->config->limit = max(min($this->config->limit, 30),1); // Cap betwen 1-30
-        
-        // load the javascript
-        //$PAGE->requires->yui_module('moodle-block_anderspink', 'M.anderspink.init');
-        
+
         if ($this->config->title) {
             $this->title = $this->config->title;
         }
         
-        if ($this->content !== null) {
-            return $this->content;
-        }
-
-        if (empty($this->instance)) {
-            $this->content = '';
-            return $this->content;
-        }
-
         $this->content = new stdClass();
         $this->content->items = array();
         $this->content->icons = array();
         $this->content->footer = '';
 
-        
         $apiKey = get_config('anderspink', 'key');
         
         if (!$apiKey || strlen(trim($apiKey)) === 0) {
             $this->content->text = 'Please set the API key in the global Anders Pink block settings.';
             return $this->content;
         }
-        
         
         $dateNow = (new DateTime())->format('Y-m-d\TH:i:s');
         $cache = cache::make('block_anderspink', 'apdata');
@@ -125,6 +120,7 @@ class block_anderspink extends block_base {
         // Cache key is based on the config and api key, so that it's invalidated when the config changes
         $key = md5(json_encode($this->config)) . $apiKey;
         
+        // Seperate out the logic for briefings vs boards (different calls, and cache times)
         if ($this->config->source === 'briefing') {
             if (!$this->config->briefing) {
                 $this->content->text = 'Please configure this block and choose a briefing to show.';
@@ -176,12 +172,13 @@ class block_anderspink extends block_base {
             return $this->content;
         }
         
+        // Get the html for the individual blocks
         $articleHtml = array();
         foreach (array_slice($response['data']['articles'],0,$this->config->limit) as $article) {
             $articleHtml[] = $this->render_article($article, $this->config->image);
         }
         
-        // Linear..
+        // Render the blocks in one or two columns
         if ($this->config->column === 1) {
             $this->content->text = implode("\n", $articleHtml);
         } else if ($this->config->column === 2) {

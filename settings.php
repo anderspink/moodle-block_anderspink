@@ -25,16 +25,9 @@
 defined('MOODLE_INTERNAL') || die();
 
 $settings->add(new admin_setting_heading('sampleheader',
-                                         get_string('headerconfig', 'block_anderspink'),
-                                         get_string('descconfig', 'block_anderspink')));
+                                         get_string('headerconfig', 'block_anderspink')
+                                     ));
 
-/*
-$settings->add(new admin_setting_configcheckbox('anderspink/foo',
-                                                get_string('labelfoo', 'block_anderspink'),
-                                                get_string('descfoo', 'block_anderspink'),
-                                                '0'));
-*/
-                                                
 $settings->add(new admin_setting_configtext('anderspink/key', 
                                             get_string('labelkey', 'block_anderspink'),
                                             get_string('desckey', 'block_anderspink'),
