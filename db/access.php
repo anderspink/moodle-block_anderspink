@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * anderspink block caps.
+ * Version details
  *
- * @package   block_anderspink
- * @copyright Anders Pink Ltd <info@anderspink.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    block_anderspink
+ * @copyright  2016 onwards Anders Pink Ltd <info@anderspink.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();

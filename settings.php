@@ -15,17 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * anderspink block caps.
+ * Version details
  *
  * @package    block_anderspink
- * @copyright  Anders Pink Ltd <info@anderspink.com>
+ * @copyright  2016 onwards Anders Pink Ltd <info@anderspink.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $settings->add(new admin_setting_heading('sampleheader',
-                                         get_string('headerconfig', 'block_anderspink')
+                                         get_string('headerconfig', 'block_anderspink'),
+                                         ''
                                      ));
 
 $settings->add(new admin_setting_configtext('anderspink/key', 

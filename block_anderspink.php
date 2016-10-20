@@ -15,10 +15,10 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * anderspink block caps.
+ * Version details
  *
  * @package    block_anderspink
- * @copyright  Anders Pink Ltd <info@anderspink.com>
+ * @copyright  2016 onwards Anders Pink Ltd <info@anderspink.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -84,22 +84,26 @@ class block_anderspink extends block_base {
             return $this->content;
         }
         
+        if (!$this->config) {
+            $this->config = new stdClass();
+        }
+        
         // defaults
-        if (!$this->config->source) {
+        if (!isset($this->config->source) || !$this->config->source) {
             $this->config->source = 'briefing';
         }
-        if (!$this->config->image) {
+        if (!isset($this->config->image) || !$this->config->image) {
             $this->config->image = 'side';
         }
-        if (!$this->config->column) {
+        if (!isset($this->config->column) || !$this->config->column) {
             $this->config->column = 1;
         }
-        if (!$this->config->limit) {
+        if (!isset($this->config->limit) || !$this->config->limit) {
             $this->config->limit = 5;
         }
         $this->config->limit = max(min($this->config->limit, 30),1); // Cap betwen 1-30
-
-        if ($this->config->title) {
+        
+        if (isset($this->config->title) && $this->config->title) {
             $this->title = $this->config->title;
         }
         
@@ -127,14 +131,14 @@ class block_anderspink extends block_base {
         
         // Seperate out the logic for briefings vs boards (different calls, and cache times)
         if ($this->config->source === 'briefing') {
-            if (!$this->config->briefing) {
+            if (!isset($this->config->briefing) || !$this->config->briefing) {
                 $this->content->text = 'Please configure this block and choose a briefing to show.';
                 return $this->content;
             }
             $dateOfExpiry = (new DateTime())->add(new DateInterval('PT1M'))->format('Y-m-d\TH:i:s'); // 1 minute
             $url = $apiHost . "/api/v1/briefings/{$this->config->briefing}?limit={$this->config->limit}";
         } else {
-            if (!$this->config->board) {
+            if (!isset($this->config->board) || !$this->config->board) {
                 $this->content->text = 'Please configure this block and choose a board to show.';
                 return $this->content;
             }
@@ -143,6 +147,7 @@ class block_anderspink extends block_base {
         }
         
         // Check the cache first...
+        $response = null;
         $stringResponse = $cache->get($key);
         if ($stringResponse) {
             $response = json_decode($stringResponse, true);

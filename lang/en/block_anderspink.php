@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -16,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'block_anderspink', language 'en'
+ * Version details
  *
- * @package   block_anderspink
- * @copyright Anders Pink Ltd <info@anderspink.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package    block_anderspink
+ * @copyright  2016 onwards Anders Pink Ltd <info@anderspink.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 $string['blockstring'] = 'Block title';
@@ -33,8 +32,8 @@ $string['descfoo'] = 'Global settings for the Anders Pink plugin';
 $string['desckey'] = "Enter the API key from your Anders Pink account or use our free account key which is <strong>WL4VDET6kcH29PDTG2RVF60Yqv76E39z</strong> to access our free  briefings. <br /><br />To find out more about how you can create custom briefings visit <a href='https://anderspink.com'>https://anderspink.com</a>.";
 $string['headerconfig'] = 'Main plugin settings';
 $string['labelkey'] = 'Anders Pink API key';
-$string['anderspink:addinstance'] = 'Add a anderspink block';
-$string['anderspink:myaddinstance'] = 'Add a anderspink block to my moodle';
+$string['anderspink:addinstance'] = 'Add an anderspink block';
+$string['anderspink:myaddinstance'] = 'Add an anderspink block to my moodle';
 $string['pluginname'] = 'Anders Pink';
 $string['cachedef_apdata'] = 'Anders Pink API result cache, for performance and reducing API calls';
 $string['sideimage'] = 'On the right (small)';
