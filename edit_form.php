@@ -92,8 +92,8 @@ class block_anderspink_edit_form extends block_edit_form {
         $mform->setType('config_title', PARAM_TEXT);
 
         $radioarray = array();
-        $radioarray[] = $mform->createElement('radio', 'config_source', '', get_string('showbriefing', 'block_anderspink'), 'briefing', $attributes);
-        $radioarray[] = $mform->createElement('radio', 'config_source', '', get_string('showsavedboard', 'block_anderspink'), 'board', $attributes);
+        $radioarray[] = $mform->createElement('radio', 'config_source', '', get_string('showbriefing', 'block_anderspink'), 'briefing');
+        $radioarray[] = $mform->createElement('radio', 'config_source', '', get_string('showsavedboard', 'block_anderspink'), 'board');
         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
         $mform->setDefault('config_source', 'briefing');
 
