@@ -21,29 +21,29 @@
  * @copyright  2016 onwards Anders Pink Ltd <info@anderspink.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 class block_anderspink_edit_form extends block_edit_form {
 
     protected function specific_definition($mform) {
-        
+
         $briefings = array('' => 'Select a briefing');
         $boards = array('' => 'Select a saved board');
         $errors = array();
-        $apiKey = get_config('anderspink', 'key');
-        
-        if (!$apiKey || strlen(trim($apiKey)) === 0) {
+        $apikey = get_config('anderspink', 'key');
+
+        if (!$apikey || strlen(trim($apikey)) === 0) {
             $errors[] = 'No API key is set for the block, please set this in the global block settings for Anders Pink';
         } else {
-            $fullResponse = download_file_content(
+            $fullresponse = download_file_content(
                 'https://anderspink.com/api/v1/users/current',
-                array('X-Api-Key' => $apiKey),
+                array('X-Api-Key' => $apikey),
                 null,
                 true
             );
-            $response = json_decode($fullResponse->results, true);
-            
+            $response = json_decode($fullresponse->results, true);
+
             if (!$response) {
-                $errors[] = 'Failed to do API call: ' . $fullResponse->error;
+                $errors[] = 'Failed to do API call: ' . $fullresponse->error;
             } else {
                 if ($response['status'] !== 'success') {
                     $errors[] = $response['message'];
@@ -60,10 +60,10 @@ class block_anderspink_edit_form extends block_edit_form {
                 }
             }
         }
-        
+
         // Section header title according to language file.
         $mform->addElement('header', 'configheader', get_string('blocksettings', 'block'));
-        
+
         if (count($errors)) {
             foreach ($errors as $i => $error) {
                 $mform->addElement('html', '<p style="background-color:#ffc7c7;padding:10px;">' . $error . '</p>');
@@ -73,22 +73,21 @@ class block_anderspink_edit_form extends block_edit_form {
         // A sample string variable with a default value.
         $mform->addElement('text', 'config_title', get_string('blockstring', 'block_anderspink'));
         $mform->setType('config_title', PARAM_TEXT);
-        
+
         $radioarray = array();
         $radioarray[] = $mform->createElement('radio', 'config_source', '', get_string('showbriefing', 'block_anderspink'), 'briefing', $attributes);
         $radioarray[] = $mform->createElement('radio', 'config_source', '', get_string('showsavedboard', 'block_anderspink'), 'board', $attributes);
         $mform->addGroup($radioarray, 'radioar', '', array(' '), false);
         $mform->setDefault('config_source', 'briefing');
-  
-        
+
         $mform->addElement('html', '<div id="source_section_briefing">');
         $mform->addElement('select', 'config_briefing', get_string('briefingselect', 'block_anderspink'), $briefings, array());
         $mform->addElement('html', '</div>');
-        
+
         $mform->addElement('html', '<div id="source_section_board">');
         $mform->addElement('select', 'config_board', get_string('boardselect', 'block_anderspink'), $boards, array());
         $mform->addElement('html', '</div>');
-        
+
         $radioarray = array();
         $radioarray[] = $mform->createElement('radio', 'config_image', '', get_string('sideimage', 'block_anderspink'), 'side');
         $radioarray[] = $mform->createElement('radio', 'config_image', '', get_string('topimage', 'block_anderspink'), 'top');
@@ -101,15 +100,15 @@ class block_anderspink_edit_form extends block_edit_form {
         $mform->addGroup($radioarray, 'radioar', 'Number of columns', array(' '), false);
         $mform->setDefault('config_column', 1);
         $mform->setType('config_column', PARAM_INT);
-        
+
         $mform->addElement('text', 'config_limit', get_string('numberofarticles', 'block_anderspink'));
         $mform->setDefault('config_limit', 5);
         $mform->setType('config_limit', PARAM_INT);
-        
+
         $mform->addElement('html', '
             <script type="text/javascript">
                 YUI().use("node", function (Y) {
-                    
+
                     function handleSourceVisibility(source) {
                         console.log("here", source);
                         if (source === "briefing") {
@@ -120,14 +119,14 @@ class block_anderspink_edit_form extends block_edit_form {
                             Y.one("#source_section_board").show();
                         }
                     }
-                    
+
                     // handle the visibility on load
                     var selectedValue = Y.one("input[name=config_source]:checked").get("value");
                     if (!selectedValue) {
                         selectedValue = "briefing";
                     }
                     handleSourceVisibility(selectedValue);
-                    
+
                     // listen to when the radio buttons are toggled
                     Y.all("input[name=config_source]").on("change", function (e) {
                         handleSourceVisibility(e.currentTarget.get("value"));
