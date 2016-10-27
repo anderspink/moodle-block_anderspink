@@ -34,27 +34,44 @@ class block_anderspink_edit_form extends block_edit_form {
         if (!$apikey || strlen(trim($apikey)) === 0) {
             $errors[] = 'No API key is set for the block, please set this in the global block settings for Anders Pink';
         } else {
-            $fullresponse = download_file_content(
-                'https://anderspink.com/api/v1/users/current',
+            $fullresponse1 = download_file_content(
+                'https://anderspink.com/api/v1/briefings',
                 array('X-Api-Key' => $apikey),
                 null,
                 true
             );
-            $response = json_decode($fullresponse->results, true);
+            $fullresponse2 = download_file_content(
+                'https://anderspink.com/api/v1/boards',
+                array('X-Api-Key' => $apikey),
+                null,
+                true
+            );
+            $response1 = json_decode($fullresponse1->results, true);
+            $response2 = json_decode($fullresponse2->results, true);
 
-            if (!$response) {
-                $errors[] = 'Failed to do API call: ' . $fullresponse->error;
+            if (!$response1 || !$response2) {
+                if (!$response1) {
+                    $errors[] = 'Failed to do API call: ' . $fullresponse1->error;
+                }
+                if (!$response2) {
+                    $errors[] = 'Failed to do API call: ' . $fullresponse2->error;
+                }
             } else {
-                if ($response['status'] !== 'success') {
-                    $errors[] = $response['message'];
+                if ($response1['status'] !== 'success' || $response2['status'] !== 'success') {
+                    if ($response1['status'] !== 'success') { 
+                        $errors[] = $response1['message'];
+                    }
+                    if ($response2['status'] !== 'success') { 
+                        $errors[] = $response2['message'];
+                    }
                 } else {
-                    foreach ($response['data']['owned_briefings'] as $briefing) {
+                    foreach ($response1['data']['owned_briefings'] as $briefing) {
                         $briefings[$briefing['id']] = $briefing['name'];
                     }
-                    foreach ($response['data']['subscribed_briefings'] as $briefing) {
+                    foreach ($response1['data']['subscribed_briefings'] as $briefing) {
                         $briefings[$briefing['id']] = $briefing['name'];
                     }
-                    foreach ($response['data']['owned_boards'] as $board) {
+                    foreach ($response2['data']['owned_boards'] as $board) {
                         $boards[$board['id']] = $board['name'];
                     }
                 }
