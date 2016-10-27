@@ -61,21 +61,19 @@
     font-size: 0.8em;
     color: #949494;
 }
-.block.block_anderspink .ap-row {
+.block.block_anderspink .ap-columns {
     overflow: hidden;
 }
-
-.block.block_anderspink .ap-column2 {
+.block.block_anderspink .ap-two-column {
+    padding: 0 5px;
     float: left;
     width: 50%;
+    box-sizing: border-box;
 }
-.block.block_anderspink .ap-column-inner-first {
-    margin-right: 5px;
+.block.block_anderspink .ap-two-column:nth-child(even) {
+    margin-right: 0;
 }
-.block.block_anderspink .ap-column-inner-last {
-    margin-left: 5px;
-}
-.block.block_anderspink .ap-column-inner {
-    margin-left: 5px;
-    margin-right: 5px;
+.block.block_anderspink .ap-two-column:nth-child(odd) {
+    margin-left: 0;
+    clear: both;
 }

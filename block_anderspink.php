@@ -192,26 +192,12 @@ class block_anderspink extends block_base {
         if ($this->config->column === 1) {
             $this->content->text = implode("\n", $articlehtml);
         } else if ($this->config->column === 2) {
-
-            $rowhtml = array();
-            $rows = array_chunk($articlehtml, 2);
-            foreach ($rows as $row) {
-                $rowhtml[] = "
-                    <div class='ap-row'>
-                        <div class='ap-column2'>
-                            <div class='ap-column-inner-first'>
-                                {$row[0]}
-                            </div>
-                        </div>
-                        <div class='ap-column2'>
-                            <div class='ap-column-inner-last'>
-                                {$row[1]}
-                            </div>
-                        </div>
-                    </div>
-                ";
-            }
-            $this->content->text = implode("\n", $rowhtml);
+            $this->content->text =
+                '<div class="ap-columns">' .
+                    implode("\n", array_map(function($item) {
+                        return '<div class="ap-two-column">' . $item . '</div>';
+                    }, $articlehtml)) .
+                '</div>';
         }
 
         return $this->content;
