@@ -35,13 +35,13 @@ class block_anderspink_edit_form extends block_edit_form {
             $errors[] = 'No API key is set for the block, please set this in the global block settings for Anders Pink';
         } else {
             $fullresponse1 = download_file_content(
-                'https://anderspink.com/api/v1/briefings',
+                'https://anderspink.com/api/v2/briefings',
                 array('X-Api-Key' => $apikey),
                 null,
                 true
             );
             $fullresponse2 = download_file_content(
-                'https://anderspink.com/api/v1/boards',
+                'https://anderspink.com/api/v2/boards',
                 array('X-Api-Key' => $apikey),
                 null,
                 true

@@ -136,14 +136,14 @@ class block_anderspink extends block_base {
                 return $this->content;
             }
             $dateofexpiry = (new DateTime())->add(new DateInterval('PT1M'))->format('Y-m-d\TH:i:s'); // 1 minute
-            $url = $apihost . "/api/v1/briefings/{$this->config->briefing}?limit={$this->config->limit}";
+            $url = $apihost . "/api/v2/briefings/{$this->config->briefing}?limit={$this->config->limit}";
         } else {
             if (!isset($this->config->board) || !$this->config->board) {
                 $this->content->text = 'Please configure this block and choose a board to show.';
                 return $this->content;
             }
             $dateofexpiry = (new DateTime())->add(new DateInterval('PT5S'))->format('Y-m-d\TH:i:s'); // 5 seconds
-            $url = $apihost . "/api/v1/boards/{$this->config->board}?limit={$this->config->limit}";
+            $url = $apihost . "/api/v2/boards/{$this->config->board}?limit={$this->config->limit}";
         }
 
         // Check the cache first...
