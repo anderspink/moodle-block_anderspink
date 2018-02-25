@@ -58,10 +58,10 @@ class block_anderspink_edit_form extends block_edit_form {
                 }
             } else {
                 if ($response1['status'] !== 'success' || $response2['status'] !== 'success') {
-                    if ($response1['status'] !== 'success') { 
+                    if ($response1['status'] !== 'success') {
                         $errors[] = $response1['message'];
                     }
-                    if ($response2['status'] !== 'success') { 
+                    if ($response2['status'] !== 'success') {
                         $errors[] = $response2['message'];
                     }
                 } else {
@@ -99,6 +99,16 @@ class block_anderspink_edit_form extends block_edit_form {
 
         $mform->addElement('html', '<div id="source_section_briefing">');
         $mform->addElement('select', 'config_briefing', get_string('briefingselect', 'block_anderspink'), $briefings, array());
+        $briefingTimes = [
+            'auto' => 'Auto (recommended)',
+            '24-hours' => '24 Hours',
+            '3-days' => '3 Days',
+            '1-week' => '1 Week',
+            '1-month' => '1 Month',
+            '3-months' => '3 Months',
+        ];
+        $mform->addElement('select', 'config_briefing_time', get_string('briefingselecttime', 'block_anderspink'), $briefingTimes, array());
+        $mform->setDefault('config_briefing_time', 'auto');
         $mform->addElement('html', '</div>');
 
         $mform->addElement('html', '<div id="source_section_board">');
@@ -121,6 +131,12 @@ class block_anderspink_edit_form extends block_edit_form {
         $mform->addElement('text', 'config_limit', get_string('numberofarticles', 'block_anderspink'));
         $mform->setDefault('config_limit', 5);
         $mform->setType('config_limit', PARAM_INT);
+
+        $mform->addElement('advcheckbox', 'config_filter_imageless', 'Only show articles that have an image', '', array('group' => 1), array(0, 1));
+        $mform->setDefault('config_filter_imageless', 0);
+
+        $mform->addElement('advcheckbox', 'config_content_preview', 'Show previews of article content', '', array('group' => 1), array(0, 1));
+        $mform->setDefault('config_content_preview', 0);
 
         $mform->addElement('html', '
             <script type="text/javascript">

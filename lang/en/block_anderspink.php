@@ -27,6 +27,7 @@ $string['boardselect'] = 'Saved boards';
 $string['showbriefing'] = 'Show a briefing';
 $string['showsavedboard'] = 'Show a saved board';
 $string['briefingselect'] = 'Briefings';
+$string['briefingselecttime'] = 'Briefings time';
 $string['descconfig'] = 'Description of the config section';
 $string['descfoo'] = 'Global settings for the Anders Pink plugin';
 $string['desckey'] = "Enter the API key from your Anders Pink account or use our free account key which is <strong>WL4VDET6kcH29PDTG2RVF60Yqv76E39z</strong> to access our free  briefings. <br /><br />To find out more about how you can create custom briefings visit <a href='https://anderspink.com'>https://anderspink.com</a>.";
@@ -41,5 +42,3 @@ $string['topimage'] = 'Above (large)';
 $string['onecolumn'] = 'One column';
 $string['twocolumns'] = 'Two columns';
 $string['numberofarticles'] = 'Number of articles to show (min 1, max 30)';
-
-

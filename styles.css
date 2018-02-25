@@ -61,6 +61,10 @@
     font-size: 0.8em;
     color: #949494;
 }
+.block.block_anderspink .ap-article-content {
+    font-size: 0.8em;
+    margin-top: 0.2em;
+}
 .block.block_anderspink .ap-columns {
     overflow: hidden;
 }

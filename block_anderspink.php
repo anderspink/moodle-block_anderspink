@@ -34,7 +34,7 @@ class block_anderspink extends block_base {
         $this->title = get_string('pluginname', 'block_anderspink');
     }
 
-    function render_article($article, $imageposition='side') {
+    function render_article($article, $imageposition='side', $content_preview=fale) {
 
         $side = $imageposition === 'side';
 
@@ -58,6 +58,7 @@ class block_anderspink extends block_base {
 
         $cutoff = 75;
         $title = strlen(trim($article['title'])) > $cutoff ? substr($article['title'],0,$cutoff) . "..." : $article['title'];
+        $content = $content_preview ? $article['content'] : '';
 
         return "
             <a class='ap-article' href='{$article['url']}' title='" . htmlspecialchars($article['title'], ENT_QUOTES) . "' target='_blank'>
@@ -66,6 +67,7 @@ class block_anderspink extends block_base {
                     <div>". htmlspecialchars($title) . "</div>
                     <div class='ap-article-text-extra'>". implode(' - ', $extra) ."</div>
                 </div>
+                " . ($content ? "<div class='ap-article-content'>{$content}</div>" : "") . "
             </a>
         ";
     }
@@ -101,7 +103,9 @@ class block_anderspink extends block_base {
         if (!isset($this->config->limit) || !$this->config->limit) {
             $this->config->limit = 5;
         }
+        $this->config->filter_imageless = isset($this->config->filter_imageless) && $this->config->filter_imageless === '1';
         $this->config->limit = max(min($this->config->limit, 30),1); // Cap betwen 1-30
+        $this->config->content_preview = isset($this->config->content_preview) && $this->config->content_preview === '1';
 
         if (isset($this->config->title) && $this->config->title) {
             $this->title = $this->config->title;
@@ -136,14 +140,15 @@ class block_anderspink extends block_base {
                 return $this->content;
             }
             $dateofexpiry = (new DateTime())->add(new DateInterval('PT1M'))->format('Y-m-d\TH:i:s'); // 1 minute
-            $url = $apihost . "/api/v2/briefings/{$this->config->briefing}?limit={$this->config->limit}";
+            $time = $this->config->briefing_time ? $this->config->briefing_time : 'auto';
+            $url = $apihost . "/api/v2/briefings/{$this->config->briefing}?time={$time}&limit={$this->config->limit}" . ($this->config->filter_imageless?"&filter_imageless":"");
         } else {
             if (!isset($this->config->board) || !$this->config->board) {
                 $this->content->text = 'Please configure this block and choose a board to show.';
                 return $this->content;
             }
             $dateofexpiry = (new DateTime())->add(new DateInterval('PT5S'))->format('Y-m-d\TH:i:s'); // 5 seconds
-            $url = $apihost . "/api/v2/boards/{$this->config->board}?limit={$this->config->limit}";
+            $url = $apihost . "/api/v2/boards/{$this->config->board}?limit={$this->config->limit}" . ($this->config->filter_imageless?"&filter_imageless":"");
         }
 
         // Check the cache first...
@@ -185,7 +190,7 @@ class block_anderspink extends block_base {
         // Get the html for the individual blocks
         $articlehtml = array();
         foreach (array_slice($response['data']['articles'],0,$this->config->limit) as $article) {
-            $articlehtml[] = $this->render_article($article, $this->config->image);
+            $articlehtml[] = $this->render_article($article, $this->config->image, $this->config->content_preview);
         }
 
         // Render the blocks in one or two columns
@@ -241,5 +246,5 @@ class block_anderspink extends block_base {
             if($day_diff < 31) { return ceil($day_diff / 7) . 'w'; }
         }
         return date('F Y', $ts);
-    } 
+    }
 }
