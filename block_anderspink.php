@@ -34,7 +34,7 @@ class block_anderspink extends block_base {
         $this->title = get_string('pluginname', 'block_anderspink');
     }
 
-    function render_article($article, $imageposition='side', $content_preview=fale) {
+    function render_article($article, $imageposition='side', $content_preview=fale, $show_comments=false) {
 
         $side = $imageposition === 'side';
 
@@ -60,14 +60,28 @@ class block_anderspink extends block_base {
         $title = strlen(trim($article['title'])) > $cutoff ? substr($article['title'],0,$cutoff) . "..." : $article['title'];
         $content = $content_preview ? $article['content'] : '';
 
+        $featured_comment = null;
+        if ($show_comments && count($article['comments']) > 0) {
+            foreach ($article['comments'] as $comment) {
+                if (isset($comment['pinned']) && $comment['pinned']) {
+                    $featured_comment = $comment;
+                }
+            }
+            if (!$featured_comment) {
+                $featured_comment = $article['comments'][count($article['comments']) - 1];
+            }
+        }
+
         return "
             <a class='ap-article' href='{$article['url']}' title='" . htmlspecialchars($article['title'], ENT_QUOTES) . "' target='_blank'>
                 {$image}
                 <div class='" . (($side && $article['image']) ? 'ap-margin-right' : '') . "'>
-                    <div>". htmlspecialchars($title) . "</div>
+                    <div class='ap-article-title'>". htmlspecialchars($title) . "</div>
                     <div class='ap-article-text-extra'>". implode(' - ', $extra) ."</div>
                 </div>
                 " . ($content ? "<div class='ap-article-content'>{$content}</div>" : "") . "
+                " . ($featured_comment ? "<div class='ap-article-comment'>Our comment: <span class='ap-article-comment-text'>\"". $featured_comment['text'] ."\"</span></div>" : "") . "
+
             </a>
         ";
     }
@@ -106,6 +120,7 @@ class block_anderspink extends block_base {
         $this->config->filter_imageless = isset($this->config->filter_imageless) && $this->config->filter_imageless === '1';
         $this->config->limit = max(min($this->config->limit, 30),1); // Cap betwen 1-30
         $this->config->content_preview = isset($this->config->content_preview) && $this->config->content_preview === '1';
+        $this->config->comment = isset($this->config->comment) && $this->config->comment === '1';
 
         if (isset($this->config->title) && $this->config->title) {
             $this->title = $this->config->title;
@@ -190,7 +205,7 @@ class block_anderspink extends block_base {
         // Get the html for the individual blocks
         $articlehtml = array();
         foreach (array_slice($response['data']['articles'],0,$this->config->limit) as $article) {
-            $articlehtml[] = $this->render_article($article, $this->config->image, $this->config->content_preview);
+            $articlehtml[] = $this->render_article($article, $this->config->image, $this->config->content_preview, $this->config->comment);
         }
 
         // Render the blocks in one or two columns

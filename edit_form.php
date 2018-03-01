@@ -109,6 +109,8 @@ class block_anderspink_edit_form extends block_edit_form {
         ];
         $mform->addElement('select', 'config_briefing_time', get_string('briefingselecttime', 'block_anderspink'), $briefingTimes, array());
         $mform->setDefault('config_briefing_time', 'auto');
+        $mform->addHelpButton('config_briefing_time', 'briefingselecttime', 'block_anderspink');
+
         $mform->addElement('html', '</div>');
 
         $mform->addElement('html', '<div id="source_section_board">');
@@ -132,11 +134,17 @@ class block_anderspink_edit_form extends block_edit_form {
         $mform->setDefault('config_limit', 5);
         $mform->setType('config_limit', PARAM_INT);
 
-        $mform->addElement('advcheckbox', 'config_filter_imageless', 'Only show articles that have an image', '', array('group' => 1), array(0, 1));
+        $mform->addElement('advcheckbox', 'config_filter_imageless', get_string('filterimagelessarticles', 'block_anderspink'), '', array('group' => 1), array(0, 1));
         $mform->setDefault('config_filter_imageless', 0);
+        $mform->addHelpButton('config_filter_imageless', 'filterimagelessarticles', 'block_anderspink');
 
-        $mform->addElement('advcheckbox', 'config_content_preview', 'Show previews of article content', '', array('group' => 1), array(0, 1));
+        $mform->addElement('advcheckbox', 'config_content_preview', get_string('showcontentpreview', 'block_anderspink'), '', array('group' => 1), array(0, 1));
         $mform->setDefault('config_content_preview', 0);
+        $mform->addHelpButton('config_content_preview', 'showcontentpreview', 'block_anderspink');
+
+        $mform->addElement('advcheckbox', 'config_comment', get_string('showcomment', 'block_anderspink'), '', array('group' => 1), array(0, 1));
+        $mform->setDefault('config_comment', 0);
+        $mform->addHelpButton('config_comment', 'showcomment', 'block_anderspink');
 
         $mform->addElement('html', '
             <script type="text/javascript">
