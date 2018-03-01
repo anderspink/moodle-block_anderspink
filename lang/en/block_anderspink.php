@@ -28,7 +28,7 @@ $string['showbriefing'] = 'Show a briefing';
 $string['showsavedboard'] = 'Show a saved folder';
 $string['briefingselect'] = 'Briefings';
 $string['briefingselecttime'] = 'Briefing time period';
-$string['briefingselecttime_help'] = 'This is the time period that you will see the top articles from. Leaving on Auto is recommended as it will select a good time period based on how many new articles are coming in. E.g. if your briefing gets many fresh articles every date, Auto will show articles from the last 24 hours rather than 3 days.';
+$string['briefingselecttime_help'] = 'This is the time period that you will see the top articles from. Leaving on Auto is recommended as it will select a good time period based on how many new articles are coming in. E.g. if your briefing gets many fresh articles every day, Auto will show articles from the last 24 hours rather than 3 days.';
 $string['descconfig'] = 'Description of the config section';
 $string['descfoo'] = 'Global settings for the Anders Pink plugin';
 $string['desckey'] = "Enter the API key from your Anders Pink account or use our free account key which is <strong>WL4VDET6kcH29PDTG2RVF60Yqv76E39z</strong> to access our free  briefings. <br /><br />To find out more about how you can create custom briefings visit <a href='https://anderspink.com'>https://anderspink.com</a>.";
