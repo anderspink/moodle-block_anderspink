@@ -1,10 +1,12 @@
 .block.block_anderspink {
 }
 
-.block.block_anderspink a.ap-article {
+.block.block_anderspink .ap-article {
+    margin-bottom: 12px;
+}
+.block.block_anderspink a.ap-article-link {
     text-decoration: none;
     color: inherit;
-    margin-bottom: 12px;
     display: block;
     line-height: normal;
     overflow: hidden;

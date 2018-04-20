@@ -71,18 +71,25 @@ class block_anderspink extends block_base {
                 $featured_comment = $article['comments'][count($article['comments']) - 1];
             }
         }
+        if ($featured_comment) {
+            // Render links from markdown
+            $featured_comment['text'] = preg_replace('/\[(.*)\]\((.*)\)/', '<a target="_blank" href="$2">$1</a>', $featured_comment['text']);
+        }
 
         return "
-            <a class='ap-article' href='{$article['url']}' title='" . htmlspecialchars($article['title'], ENT_QUOTES) . "' target='_blank'>
-                {$image}
-                <div class='" . (($side && $article['image']) ? 'ap-margin-right' : '') . "'>
-                    <div class='ap-article-title'>". htmlspecialchars($title) . "</div>
-                    <div class='ap-article-text-extra'>". implode(' - ', $extra) ."</div>
-                </div>
+            <div class='ap-article'>
+              <a class='ap-article-link' href='{$article['url']}' title='" . htmlspecialchars($article['title'], ENT_QUOTES) . "' target='_blank'>
+                  {$image}
+                  <div class='" . (($side && $article['image']) ? 'ap-margin-right' : '') . "'>
+                      <div class='ap-article-title'>". htmlspecialchars($title) . "</div>
+                      <div class='ap-article-text-extra'>". implode(' - ', $extra) ."</div>
+                  </div>
+              </a>
+              <div>
                 " . ($content ? "<div class='ap-article-content'>{$content}</div>" : "") . "
                 " . ($featured_comment ? "<div class='ap-article-comment'>Our comment: <span class='ap-article-comment-text'>\"". $featured_comment['text'] ."\"</span></div>" : "") . "
-
-            </a>
+              </div>
+            </div>
         ";
     }
 
