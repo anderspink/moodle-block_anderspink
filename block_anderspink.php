@@ -34,7 +34,7 @@ class block_anderspink extends block_base {
         $this->title = get_string('pluginname', 'block_anderspink');
     }
 
-    function render_article($article, $imageposition='side', $content_preview=fale, $show_comments=false) {
+    function render_article($article, $imageposition='side', $content_preview=false, $show_comments=false) {
 
         $side = $imageposition === 'side';
 
