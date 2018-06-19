@@ -99,14 +99,14 @@ class block_anderspink_edit_form extends block_edit_form {
 
         $mform->addElement('html', '<div id="source_section_briefing">');
         $mform->addElement('select', 'config_briefing', get_string('briefingselect', 'block_anderspink'), $briefings, array());
-        $briefingTimes = [
+        $briefingTimes = array(
             'auto' => 'Auto (recommended)',
             '24-hours' => '24 Hours',
             '3-days' => '3 Days',
             '1-week' => '1 Week',
             '1-month' => '1 Month',
             '3-months' => '3 Months',
-        ];
+        );
         $mform->addElement('select', 'config_briefing_time', get_string('briefingselecttime', 'block_anderspink'), $briefingTimes, array());
         $mform->setDefault('config_briefing_time', 'auto');
         $mform->addHelpButton('config_briefing_time', 'briefingselecttime', 'block_anderspink');

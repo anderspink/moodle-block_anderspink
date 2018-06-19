@@ -26,12 +26,15 @@ defined('MOODLE_INTERNAL') || die();
 
 // Unfortunatly due to a bug in moodle, filelib wasn't always being included, and we need it!
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
+require_once(dirname(__FILE__) . '/ap_cache.php');
+
 require_once($CFG->libdir .'/filelib.php');
 
 class block_anderspink extends block_base {
 
     function init() {
         $this->title = get_string('pluginname', 'block_anderspink');
+        $this->cache = new ap_cache();
     }
 
     function render_article($article, $imageposition='side', $content_preview=false, $show_comments=false) {
@@ -145,8 +148,8 @@ class block_anderspink extends block_base {
             return $this->content;
         }
 
-        $datenow = (new DateTime())->format('Y-m-d\TH:i:s');
-        $cache = cache::make('block_anderspink', 'apdata');
+        $date = new DateTime();
+        $datenow = $date->format('Y-m-d\TH:i:s');
 
         $key = null;
         $dateofexpiry = null;
@@ -161,7 +164,8 @@ class block_anderspink extends block_base {
                 $this->content->text = 'Please configure this block and choose a briefing to show.';
                 return $this->content;
             }
-            $dateofexpiry = (new DateTime())->add(new DateInterval('PT1M'))->format('Y-m-d\TH:i:s'); // 1 minute
+            $date = new DateTime();
+            $dateofexpiry = $date->add(new DateInterval('PT1M'))->format('Y-m-d\TH:i:s'); // 1 minute
             $time = $this->config->briefing_time ? $this->config->briefing_time : 'auto';
             $url = $apihost . "/api/v2/briefings/{$this->config->briefing}?time={$time}&limit={$this->config->limit}" . ($this->config->filter_imageless?"&filter_imageless":"");
         } else {
@@ -169,13 +173,14 @@ class block_anderspink extends block_base {
                 $this->content->text = 'Please configure this block and choose a board to show.';
                 return $this->content;
             }
-            $dateofexpiry = (new DateTime())->add(new DateInterval('PT5S'))->format('Y-m-d\TH:i:s'); // 5 seconds
+            $date = new DateTime();
+            $dateofexpiry = $date->add(new DateInterval('PT5S'))->format('Y-m-d\TH:i:s'); // 5 seconds
             $url = $apihost . "/api/v2/boards/{$this->config->board}?limit={$this->config->limit}" . ($this->config->filter_imageless?"&filter_imageless":"");
         }
 
         // Check the cache first...
         $response = null;
-        $stringresponse = $cache->get($key);
+        $stringresponse = $this->cache->get($key);
         if ($stringresponse) {
             $response = json_decode($stringresponse, true);
             if ($datenow > $response['ttl']) {
@@ -195,7 +200,7 @@ class block_anderspink extends block_base {
 
             if ($response && $response['status'] === 'success') {
                 $response['ttl'] = $dateofexpiry;
-                $cache->set($key, json_encode($response));
+                $this->cache->set($key, json_encode($response));
             }
         }
 
