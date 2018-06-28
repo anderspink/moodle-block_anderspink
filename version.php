@@ -25,8 +25,8 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2018061901;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->requires  = 2011120511;        // Requires this Moodle version
+$plugin->requires  = 2011120506;        // Requires this Moodle version
 $plugin->component = 'block_anderspink'; // Full name of the plugin (used for diagnostics)
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = 'v3.4';
+$plugin->release = 'v3.5';
 $plugin->cron = 300;
