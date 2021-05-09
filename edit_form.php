@@ -23,7 +23,6 @@
  */
 
 class block_anderspink_edit_form extends block_edit_form {
-
     protected function specific_definition($mform) {
 
         $briefings = array('' => 'Select a briefing');
@@ -31,48 +30,66 @@ class block_anderspink_edit_form extends block_edit_form {
         $errors = array();
         $apikey = get_config('anderspink', 'key');
 
+        $apikeyoptions = array('' => 'Select an API key');
+
         if (!$apikey || strlen(trim($apikey)) === 0) {
             $errors[] = 'No API key is set for the block, please set this in the global block settings for Anders Pink';
         } else {
-            $fullresponse1 = download_file_content(
-                'https://anderspink.com/api/v2/briefings',
-                array('X-Api-Key' => $apikey),
-                null,
-                true
-            );
-            $fullresponse2 = download_file_content(
-                'https://anderspink.com/api/v2/boards',
-                array('X-Api-Key' => $apikey),
-                null,
-                true
-            );
-            $response1 = json_decode($fullresponse1->results, true);
-            $response2 = json_decode($fullresponse2->results, true);
 
-            if (!$response1 || !$response2) {
-                if (!$response1) {
-                    $errors[] = 'Failed to do API call: ' . $fullresponse1->error;
-                }
-                if (!$response2) {
-                    $errors[] = 'Failed to do API call: ' . $fullresponse2->error;
-                }
-            } else {
-                if ($response1['status'] !== 'success' || $response2['status'] !== 'success') {
-                    if ($response1['status'] !== 'success') {
-                        $errors[] = $response1['message'];
+            // Try to parse the API key as JSON
+            $apikeys = json_decode($apikey, true);
+            if (!$apikeys) {
+                // As it's failed to parse as JSON, lets assume it's a string key (old method)
+                $apikeys = array(array("id" => 1, "key" => $apikey, "label" => "Default"));
+            }
+
+            foreach ($apikeys as $apikey) {
+                $apikeyoptions[$apikey['id']] = $apikey['label'];
+            }
+
+
+            // Get the briefings/boards for each key
+            foreach ($apikeys as $apikey) {
+                $fullresponse1 = download_file_content(
+                    'https://anderspink.com/api/v2/briefings',
+                    array('X-Api-Key' => $apikey['key']),
+                    null,
+                    true
+                );
+                $fullresponse2 = download_file_content(
+                    'https://anderspink.com/api/v2/boards',
+                    array('X-Api-Key' => $apikey['key']),
+                    null,
+                    true
+                );
+                $response1 = json_decode($fullresponse1->results, true);
+                $response2 = json_decode($fullresponse2->results, true);
+
+                if (!$response1 || !$response2) {
+                    if (!$response1) {
+                        $errors[] = 'Failed to do API call: ' . $fullresponse1->error;
                     }
-                    if ($response2['status'] !== 'success') {
-                        $errors[] = $response2['message'];
+                    if (!$response2) {
+                        $errors[] = 'Failed to do API call: ' . $fullresponse2->error;
                     }
                 } else {
-                    foreach ($response1['data']['owned_briefings'] as $briefing) {
-                        $briefings[$briefing['id']] = $briefing['name'];
-                    }
-                    foreach ($response1['data']['subscribed_briefings'] as $briefing) {
-                        $briefings[$briefing['id']] = $briefing['name'];
-                    }
-                    foreach ($response2['data']['owned_boards'] as $board) {
-                        $boards[$board['id']] = $board['name'];
+                    if ($response1['status'] !== 'success' || $response2['status'] !== 'success') {
+                        if ($response1['status'] !== 'success') {
+                            $errors[] = $response1['message'] . ' (API key #' . $apikey['id'] . ')';
+                        }
+                        if ($response2['status'] !== 'success') {
+                            $errors[] = $response2['message'] . ' (API key #' . $apikey['id'] . ')';
+                        }
+                    } else {
+                        foreach ($response1['data']['owned_briefings'] as $briefing) {
+                            $briefings[$briefing['id']] = $apikey['id'] . '_____' . $briefing['name'];
+                        }
+                        foreach ($response1['data']['subscribed_briefings'] as $briefing) {
+                            $briefings[$briefing['id']] = $apikey['id'] . '_____' . $briefing['name'];
+                        }
+                        foreach ($response2['data']['owned_boards'] as $board) {
+                            $boards[$board['id']] = $apikey['id'] . '_____' . $board['name'];
+                        }
                     }
                 }
             }
@@ -91,6 +108,8 @@ class block_anderspink_edit_form extends block_edit_form {
         $mform->addElement('text', 'config_title', get_string('blockstring', 'block_anderspink'));
         $mform->setType('config_title', PARAM_TEXT);
 
+        $mform->addElement('select', 'config_apikeyid', 'API key', $apikeyoptions, array());
+
         $radioarray = array();
         $radioarray[] = $mform->createElement('radio', 'config_source', '', get_string('showbriefing', 'block_anderspink'), 'briefing');
         $radioarray[] = $mform->createElement('radio', 'config_source', '', get_string('showsavedboard', 'block_anderspink'), 'board');
@@ -98,7 +117,7 @@ class block_anderspink_edit_form extends block_edit_form {
         $mform->setDefault('config_source', 'briefing');
 
         $mform->addElement('html', '<div id="source_section_briefing">');
-        $mform->addElement('select', 'config_briefing', get_string('briefingselect', 'block_anderspink'), $briefings, array());
+        $mform->addElement('select', 'config_briefing', get_string('briefingselect', 'block_anderspink'), $briefings);
         $briefingTimes = array(
             'auto' => 'Auto (recommended)',
             '24-hours' => '24 Hours',
@@ -149,7 +168,6 @@ class block_anderspink_edit_form extends block_edit_form {
         $mform->addElement('html', '
             <script type="text/javascript">
                 YUI().use("node", function (Y) {
-
                     function handleSourceVisibility(source) {
                         console.log("here", source);
                         if (source === "briefing") {
@@ -172,6 +190,47 @@ class block_anderspink_edit_form extends block_edit_form {
                     Y.all("input[name=config_source]").on("change", function (e) {
                         handleSourceVisibility(e.currentTarget.get("value"));
                     });
+
+                    // listen to when api key select is changed
+                    Y.all("select[name=config_apikeyid]").on("change", function (e) {
+                        useApiKey(e.currentTarget.get("value"))
+                    });
+
+
+                    // store data-apikeyid attr on each option to allow for filtering later
+                    for (var entity of ["briefing", "board"]) {
+                        Y.one("select[name=config_"+entity+"]").all("option").each(function(n) {
+                            if (n.getAttribute("value").length > 0) {
+                                var parts = n.getHTML().split("_____")
+                                n.setAttribute("data-apikeyid", parts[0])
+                                n.setHTML(parts[1])
+                            }
+                        })
+                    }
+
+                    function useApiKey(keyId) {
+                        for (var entity of ["briefing", "board"]) {
+                            var node = Y.one("select[name=config_"+entity+"]")
+                            var selectedValue = node.get("value")
+                            var valueStillAvailable = false
+                            node.all("option").hide().setAttribute("disabled")
+                            if (keyId !== "") {
+                                node.all("option[data-apikeyid=\'"+keyId+"\']").each(function(n) {
+                                    n.show().removeAttribute("disabled")
+                                    if (selectedValue === n.getAttribute("value")) {
+                                        valueStillAvailable = true
+                                    }
+                                })
+                            }
+                            if (!valueStillAvailable) {
+                                node.set("value", "")
+                            }
+                        }
+                    }
+
+                    // on load, filter the briefings/boards by the selected api key
+                    useApiKey(Y.one("select[name=config_apikeyid]").get("value"))
+
                 });
             </script>
         ');

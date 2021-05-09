@@ -29,7 +29,7 @@ $settings->add(new admin_setting_heading('sampleheader',
                                          ''
                                          ));
 
-$settings->add(new admin_setting_configtext('anderspink/key', 
+$settings->add(new admin_setting_configtextarea('anderspink/key', 
                                             get_string('labelkey', 'block_anderspink'),
                                             get_string('desckey', 'block_anderspink'),
                                             ''

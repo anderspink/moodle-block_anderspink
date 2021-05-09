@@ -28,7 +28,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once(dirname(dirname(dirname(__FILE__))) . '/config.php');
 require_once(dirname(__FILE__) . '/ap_cache.php');
 
-require_once($CFG->libdir .'/filelib.php');
+require_once($CFG->libdir . '/filelib.php');
 
 class block_anderspink extends block_base {
 
@@ -37,7 +37,7 @@ class block_anderspink extends block_base {
         $this->cache = new ap_cache();
     }
 
-    function render_article($article, $imageposition='side', $content_preview=false, $show_comments=false) {
+    function render_article($article, $imageposition = 'side', $content_preview = false, $show_comments = false) {
 
         $side = $imageposition === 'side';
 
@@ -60,7 +60,7 @@ class block_anderspink extends block_base {
         }
 
         $cutoff = 75;
-        $title = strlen(trim($article['title'])) > $cutoff ? substr($article['title'],0,$cutoff) . "..." : $article['title'];
+        $title = strlen(trim($article['title'])) > $cutoff ? substr($article['title'], 0, $cutoff) . "..." : $article['title'];
         $content = $content_preview ? $article['content'] : '';
 
         $featured_comment = null;
@@ -84,13 +84,13 @@ class block_anderspink extends block_base {
               <a class='ap-article-link' href='{$article['url']}' title='" . htmlspecialchars($article['title'], ENT_QUOTES) . "' target='_blank'>
                   {$image}
                   <div class='" . (($side && $article['image']) ? 'ap-margin-right' : '') . "'>
-                      <div class='ap-article-title'>". htmlspecialchars($title) . "</div>
-                      <div class='ap-article-text-extra'>". implode(' - ', $extra) ."</div>
+                      <div class='ap-article-title'>" . htmlspecialchars($title) . "</div>
+                      <div class='ap-article-text-extra'>" . implode(' - ', $extra) . "</div>
                   </div>
               </a>
               <div>
                 " . ($content ? "<div class='ap-article-content'>{$content}</div>" : "") . "
-                " . ($featured_comment ? "<div class='ap-article-comment'>Our comment: <span class='ap-article-comment-text'>\"". $featured_comment['text'] ."\"</span></div>" : "") . "
+                " . ($featured_comment ? "<div class='ap-article-comment'>Our comment: <span class='ap-article-comment-text'>\"" . $featured_comment['text'] . "\"</span></div>" : "") . "
               </div>
             </div>
         ";
@@ -128,7 +128,7 @@ class block_anderspink extends block_base {
             $this->config->limit = 5;
         }
         $this->config->filter_imageless = isset($this->config->filter_imageless) && $this->config->filter_imageless === '1';
-        $this->config->limit = max(min($this->config->limit, 30),1); // Cap betwen 1-30
+        $this->config->limit = max(min($this->config->limit, 30), 1); // Cap betwen 1-30
         $this->config->content_preview = isset($this->config->content_preview) && $this->config->content_preview === '1';
         $this->config->comment = isset($this->config->comment) && $this->config->comment === '1';
 
@@ -146,6 +146,28 @@ class block_anderspink extends block_base {
         if (!$apikey || strlen(trim($apikey)) === 0) {
             $this->content->text = 'Please set the API key in the global Anders Pink block settings.';
             return $this->content;
+        }
+
+        // Try and parse the key as JSON
+        $apikeys = json_decode($apikey, true);
+        if ($apikeys && count($apikeys) > 0) {
+            // If we have a key ID, find the key itself
+            if ($this->config->apikeyid) {
+                $found = false;
+                foreach ($apikeys as $apikeyrow) {
+                    if ($apikeyrow['id'] === $this->config->apikeyid) {
+                        $apikey = $apikeyrow['key'];
+                        $found = true;
+                    }
+                }
+                if (!$found) {
+                    $this->content->text = 'Error: couldn\'t find key with id ' . $this->config->apikeyid;
+                    return $this->content;
+                }
+            } else {
+                // Use the first key by default
+                $apikey = $apikeys[0]['key'];
+            }
         }
 
         $date = new DateTime();
@@ -167,7 +189,7 @@ class block_anderspink extends block_base {
             $date = new DateTime();
             $dateofexpiry = $date->add(new DateInterval('PT1M'))->format('Y-m-d\TH:i:s'); // 1 minute
             $time = $this->config->briefing_time ? $this->config->briefing_time : 'auto';
-            $url = $apihost . "/api/v2/briefings/{$this->config->briefing}?time={$time}&limit={$this->config->limit}" . ($this->config->filter_imageless?"&filter_imageless":"");
+            $url = $apihost . "/api/v2/briefings/{$this->config->briefing}?time={$time}&limit={$this->config->limit}" . ($this->config->filter_imageless ? "&filter_imageless" : "");
         } else {
             if (!isset($this->config->board) || !$this->config->board) {
                 $this->content->text = 'Please configure this block and choose a board to show.';
@@ -175,7 +197,7 @@ class block_anderspink extends block_base {
             }
             $date = new DateTime();
             $dateofexpiry = $date->add(new DateInterval('PT5S'))->format('Y-m-d\TH:i:s'); // 5 seconds
-            $url = $apihost . "/api/v2/boards/{$this->config->board}?limit={$this->config->limit}" . ($this->config->filter_imageless?"&filter_imageless":"");
+            $url = $apihost . "/api/v2/boards/{$this->config->board}?limit={$this->config->limit}" . ($this->config->filter_imageless ? "&filter_imageless" : "");
         }
 
         // Check the cache first...
@@ -216,7 +238,7 @@ class block_anderspink extends block_base {
 
         // Get the html for the individual blocks
         $articlehtml = array();
-        foreach (array_slice($response['data']['articles'],0,$this->config->limit) as $article) {
+        foreach (array_slice($response['data']['articles'], 0, $this->config->limit) as $article) {
             $articlehtml[] = $this->render_article($article, $this->config->image, $this->config->content_preview, $this->config->comment);
         }
 
@@ -226,9 +248,9 @@ class block_anderspink extends block_base {
         } else if ($this->config->column === 2) {
             $this->content->text =
                 '<div class="ap-columns">' .
-                    implode("\n", array_map(function($item) {
-                        return '<div class="ap-two-column">' . $item . '</div>';
-                    }, $articlehtml)) .
+                implode("\n", array_map(function ($item) {
+                    return '<div class="ap-two-column">' . $item . '</div>';
+                }, $articlehtml)) .
                 '</div>';
         }
 
@@ -240,7 +262,7 @@ class block_anderspink extends block_base {
     }
 
     public function instance_allow_multiple() {
-          return true;
+        return true;
     }
 
     function has_config() {
@@ -253,24 +275,30 @@ class block_anderspink extends block_base {
     }
 
     private function time2str($ts) {
-        if(!ctype_digit($ts)) {
+        if (!ctype_digit($ts)) {
             $ts = strtotime($ts);
         }
         $diff = time() - $ts;
-        if($diff == 0) {
+        if ($diff == 0) {
             return 'now';
-        } elseif($diff > 0) {
+        } elseif ($diff > 0) {
             $day_diff = floor($diff / 86400);
-            if($day_diff == 0) {
-                if($diff < 60) return 'just now';
-                if($diff < 120) return '1m';
-                if($diff < 3600) return floor($diff / 60) . 'm';
-                if($diff < 7200) return '1h';
-                if($diff < 86400) return floor($diff / 3600) . 'h';
+            if ($day_diff == 0) {
+                if ($diff < 60) return 'just now';
+                if ($diff < 120) return '1m';
+                if ($diff < 3600) return floor($diff / 60) . 'm';
+                if ($diff < 7200) return '1h';
+                if ($diff < 86400) return floor($diff / 3600) . 'h';
             }
-            if($day_diff == 1) { return '1d'; }
-            if($day_diff < 7) { return $day_diff . 'd'; }
-            if($day_diff < 31) { return ceil($day_diff / 7) . 'w'; }
+            if ($day_diff == 1) {
+                return '1d';
+            }
+            if ($day_diff < 7) {
+                return $day_diff . 'd';
+            }
+            if ($day_diff < 31) {
+                return ceil($day_diff / 7) . 'w';
+            }
         }
         return date('F Y', $ts);
     }
